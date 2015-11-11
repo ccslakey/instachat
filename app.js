@@ -1,4 +1,6 @@
 Messages = new Mongo.Collection("messages");
+Channels = new Mongo.Collection("channels");
+
 
 if (Meteor.isClient) {
     Meteor.subscribe("messages");
@@ -8,11 +10,11 @@ if (Meteor.isClient) {
     });
 
 
-
-
     // decide to return insta or app username
-    Template.registerHelper("usernameFromId", function (userId) {
-        var user = Meteor.users.findOne({_id: userId});
+    Template.registerHelper("usernameFromId", function(userId) {
+        var user = Meteor.users.findOne({
+            _id: userId
+        });
         if (typeof user === "undefined") {
             return "Anonymous";
         }
@@ -21,12 +23,12 @@ if (Meteor.isClient) {
     });
 
     // get format timestamp
-    Template.registerHelper("timestampToTime", function (timestamp) {
+    Template.registerHelper("timestampToTime", function(timestamp) {
         var date = new Date(timestamp);
         var hours = date.getHours();
         var minutes = "0" + date.getMinutes();
         var seconds = "0" + date.getSeconds();
-        return hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
+        return hours + ':' + minutes.substr(minutes.length - 2) + ':' + seconds.substr(seconds.length - 2);
     });
 
 
@@ -37,29 +39,31 @@ if (Meteor.isClient) {
 
     // listen for submit message event
     Template.footer.events({
-      'keypress input': function(e) {
-        var inputVal = $('.input-box_text').val();
-        if(!!inputVal) {
-          var charCode = (typeof e.which == "number") ? e.which : e.keyCode;
-          if (charCode == 13) {
-            e.stopPropagation();
-            
-            Meteor.call('newMessage', {text: $('.input-box_text').val()});
+        'keypress input': function(e) {
+            var inputVal = $('.input-box_text').val();
+            if (!!inputVal) {
+                var charCode = (typeof e.which == "number") ? e.which : e.keyCode;
+                if (charCode == 13) {
+                    e.stopPropagation();
 
-            $('.input-box_text').val("");
-            return false;
-          }    
+                    Meteor.call('newMessage', {
+                        text: $('.input-box_text').val()
+                    });
+
+                    $('.input-box_text').val("");
+                    return false;
+                }
+            }
         }
-      }
     });
     // have to include on Client side for latency compensation
     // if you have no connection to server you can still send a message on the client
     Meteor.methods({
-      newMessage: function (message) {
-        message.timestamp = Date.now();
-        message.user = Meteor.userId();
-        Messages.insert(message);
-      }
+        newMessage: function(message) {
+            message.timestamp = Date.now();
+            message.user = Meteor.userId();
+            Messages.insert(message);
+        }
     });
 
 
@@ -68,43 +72,34 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
     Meteor.publish("messages", function() {
-        return Messages.find();
-    })
-    // allow messages if they are properly logged in
+            return Messages.find();
+        })
+    // allow messages if user is properly logged in
     Messages.allow({
-      insert: function (userId, doc) {
-       return (userId && doc.user === userId);
-      }
+        insert: function(userId, doc) {
+            return (userId && doc.user === userId);
+        }
     });
 
     Meteor.methods({
-      newMessage: function (message) {
-        message.timestamp = Date.now();
-        message.user = Meteor.userId();
-        Messages.insert(message);
-      }
+        newMessage: function(message) {
+            message.timestamp = Date.now();
+            message.user = Meteor.userId();
+            Messages.insert(message);
+        }
     })
-    
+
     Meteor.startup(function() {
-    
+
         // set up email to confirm account creation with user
         // thx mandrill
         smtp = {
             username: 'cromwellslakey@gmail.com',
             password: 'orange3cow',
-            server:   'smtp.mandrillapp.com',
+            server: 'smtp.mandrillapp.com',
             port: 587
-         };
-            
+        };
         process.env.MAIL_URL = 'smtp://' + encodeURIComponent(smtp.username) + ':' + encodeURIComponent(smtp.password) + '@' + encodeURIComponent(smtp.server) + ':' + smtp.port;
 
-
-
-        // sanity check your db and you will be pleased as punch
-        //     for (var i = 0; i < 10; i++) {
-        //         Messages.insert({
-        //             text: "A dummy message"
-        //         });
-        // }
     });
 }
