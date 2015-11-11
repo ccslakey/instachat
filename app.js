@@ -3,6 +3,12 @@ Messages = new Mongo.Collection("messages");
 if (Meteor.isClient) {
     Meteor.subscribe("messages");
 
+    Accounts.ui.config({
+        passwordSignupFields: 'USERNAME_ONLY'
+    });
+
+
+
 
     Template.messages.helpers({
         messages: Messages.find({})
