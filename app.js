@@ -31,15 +31,32 @@ if (Meteor.isClient) {
         return hours + ':' + minutes.substr(minutes.length - 2) + ':' + seconds.substr(seconds.length - 2);
     });
 
+    Template.channel.helpers({
+        active: function() {
+            if (Session.get('channel') === this.name) {
+                return "active";
+            } else {
+                return "";
+            }
+        }
+    });
+
 
     Template.messages.helpers({
         messages: Messages.find({})
     });
 
+    Template.messages.onCreated(function() {
+      var self = this;
+      self.autorun(function() {
+        self.subscribe('messages', Session.get('channel'));
+      });
+    });
+
     // setting and getting channels
     // needs to be on client?
     Meteor.startup(function() {
-        Session.set('channel', 'general');
+        Session.setTemp('channel', 'general');
     });
     Template.listings.helpers({
         channels: function() {
@@ -47,8 +64,10 @@ if (Meteor.isClient) {
         }
     });
     Template.channel.events({
-        'click .channel': function (e) {
-            Session.set('channel', this.name);
+        'click .channel': function(e) {
+            // make persistent across refresh/site visits??
+            // fix me!
+            Session.setPersistent('channel', this.name);
         }
     });
 
@@ -62,8 +81,10 @@ if (Meteor.isClient) {
                     e.stopPropagation();
 
                     Meteor.call('newMessage', {
-                        text: $('.input-box_text').val()
+                        text: $('.input-box_text').val(),
+                        channel: Session.get('channel')
                     });
+                    
 
                     $('.input-box_text').val("");
                     return false;
@@ -85,8 +106,8 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
     // publications to client so we can hide our db from weird people
-    Meteor.publish("messages", function() {
-        return Messages.find();
+    Meteor.publish("messages", function(channel) {
+        return Messages.find({channel: channel});
     });
     Meteor.publish('channels', function() {
         return Channels.find();

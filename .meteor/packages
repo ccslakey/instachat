@@ -23,3 +23,5 @@ bozhao:accounts-instagram
 service-configuration
 email
 http
+u2622:persistent-session
+iron:router
