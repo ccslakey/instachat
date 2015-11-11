@@ -10,12 +10,32 @@ if (Meteor.isClient) {
 
 
 
+    // decide to return insta or app username
+    Template.registerHelper("usernameFromId", function (userId) {
+        var user = Meteor.users.findOne({_id: userId});
+        if (typeof user === "undefined") {
+            return "Anonymous";
+        }
+
+        return user.username;
+    });
+
+    // get format timestamp
+    Template.registerHelper("timestampToTime", function (timestamp) {
+        var date = new Date(timestamp);
+        var hours = date.getHours();
+        var minutes = "0" + date.getMinutes();
+        var seconds = "0" + date.getSeconds();
+        return hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
+    });
+
+
     Template.messages.helpers({
         messages: Messages.find({})
     });
 
 
-    // listen for submit message
+    // listen for submit message event
     Template.footer.events({
       'keypress input': function(e) {
         var inputVal = $('.input-box_text').val();
@@ -23,7 +43,13 @@ if (Meteor.isClient) {
           var charCode = (typeof e.which == "number") ? e.which : e.keyCode;
           if (charCode == 13) {
             e.stopPropagation();
-            Messages.insert({text: $('.input-box_text').val()});
+            
+            Messages.insert({
+            text: $('.input-box_text').val(),
+            user: Meteor.userId(),
+            timestamp: Date.now()
+            });
+
             $('.input-box_text').val("");
             return false;
           }    
@@ -38,6 +64,7 @@ if (Meteor.isServer) {
     Meteor.publish("messages", function() {
         return Messages.find();
     })
+
 
     
     Meteor.startup(function() {
