@@ -4,6 +4,7 @@ Channels = new Mongo.Collection("channels");
 
 if (Meteor.isClient) {
     Meteor.subscribe("messages");
+    Meteor.subscribe("channels");
 
     Accounts.ui.config({
         passwordSignupFields: 'USERNAME_AND_EMAIL'
@@ -21,7 +22,6 @@ if (Meteor.isClient) {
 
         return user.username;
     });
-
     // get format timestamp
     Template.registerHelper("timestampToTime", function(timestamp) {
         var date = new Date(timestamp);
@@ -36,6 +36,21 @@ if (Meteor.isClient) {
         messages: Messages.find({})
     });
 
+    // setting and getting channels
+    // needs to be on client?
+    Meteor.startup(function() {
+        Session.set('channel', 'general');
+    });
+    Template.listings.helpers({
+        channels: function() {
+            return Channels.find();
+        }
+    });
+    Template.channel.events({
+        'click .channel': function (e) {
+            Session.set('channel', this.name);
+        }
+    });
 
     // listen for submit message event
     Template.footer.events({
@@ -65,15 +80,38 @@ if (Meteor.isClient) {
             Messages.insert(message);
         }
     });
-
-
 }
 
 
 if (Meteor.isServer) {
+    // publications to client so we can hide our db from weird people
     Meteor.publish("messages", function() {
-            return Messages.find();
-        })
+        return Messages.find();
+    });
+    Meteor.publish('channels', function() {
+        return Channels.find();
+    });
+    Channels.remove({});
+    Channels.insert({
+        name: "general"
+    });
+    Channels.insert({
+        name: "random"
+    });
+
+    Meteor.startup(function() {
+        // set up email to confirm account creation with user
+        // thx mandrill
+        smtp = {
+            username: 'cromwellslakey@gmail.com',
+            password: 'orange3cow',
+            server: 'smtp.mandrillapp.com',
+            port: 587
+        };
+        process.env.MAIL_URL = 'smtp://' + encodeURIComponent(smtp.username) + ':' + encodeURIComponent(smtp.password) + '@' + encodeURIComponent(smtp.server) + ':' + smtp.port;
+
+    });
+
     // allow messages if user is properly logged in
     Messages.allow({
         insert: function(userId, doc) {
@@ -87,19 +125,5 @@ if (Meteor.isServer) {
             message.user = Meteor.userId();
             Messages.insert(message);
         }
-    })
-
-    Meteor.startup(function() {
-
-        // set up email to confirm account creation with user
-        // thx mandrill
-        smtp = {
-            username: 'cromwellslakey@gmail.com',
-            password: 'orange3cow',
-            server: 'smtp.mandrillapp.com',
-            port: 587
-        };
-        process.env.MAIL_URL = 'smtp://' + encodeURIComponent(smtp.username) + ':' + encodeURIComponent(smtp.password) + '@' + encodeURIComponent(smtp.server) + ':' + smtp.port;
-
     });
 }
