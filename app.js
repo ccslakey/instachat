@@ -44,11 +44,7 @@ if (Meteor.isClient) {
           if (charCode == 13) {
             e.stopPropagation();
             
-            Messages.insert({
-            text: $('.input-box_text').val(),
-            user: Meteor.userId(),
-            timestamp: Date.now()
-            });
+            Meteor.call('newMessage', {text: $('.input-box_text').val()});
 
             $('.input-box_text').val("");
             return false;
@@ -56,6 +52,16 @@ if (Meteor.isClient) {
         }
       }
     });
+    // have to include on Client side for latency compensation
+    // if you have no connection to server you can still send a message on the client
+    Meteor.methods({
+      newMessage: function (message) {
+        message.timestamp = Date.now();
+        message.user = Meteor.userId();
+        Messages.insert(message);
+      }
+    });
+
 
 }
 
@@ -64,8 +70,20 @@ if (Meteor.isServer) {
     Meteor.publish("messages", function() {
         return Messages.find();
     })
+    // allow messages if they are properly logged in
+    Messages.allow({
+      insert: function (userId, doc) {
+       return (userId && doc.user === userId);
+      }
+    });
 
-
+    Meteor.methods({
+      newMessage: function (message) {
+        message.timestamp = Date.now();
+        message.user = Meteor.userId();
+        Messages.insert(message);
+      }
+    })
     
     Meteor.startup(function() {
     
