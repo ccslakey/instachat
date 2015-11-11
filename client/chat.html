@@ -8,55 +8,13 @@
 </head>
 
 <body>
-
-{{> header}}
-    
-
+    {{> header}}
     <div class="main">
-     
-     <!-- {{> listings}}   -->
-        <div class="listings">
-            <div class="listings_channels">
-                <h2 class="listings_header">Channels</h2>
-                <ul class="channel_list">
-                    <li class="channel active ">
-                        <a class="channel_name">
-                            <span class="unread">42</span>
-                            <span>
-                                <span class="prefix">#</span> general
-                            </span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="listings_direct-messages"></div>
-        </div>
+        {{> listings}} 
 
         {{> messages}}
-<!--         <div class="message-history">
-            <div class="message">
-                <a href="" class="message_profile-pic"></a>
-                <a href="" class="message_username">scotch</a>
-                <span class="message_timestamp">1:31 AM</span>
-                <span class="message_star"></span>
-                <span class="message_content">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rem molestias incidunt officia animi ducimus nostrum a cum, sunt, minima fugit repellendus assumenda expedita. Eaque autem vero delectus, optio, consequuntur suscipit.</span>
-            </div>
-        </div>
-    </div> -->
-    
+        
+        {{> footer}}
 
-
-    <!-- {{> footer}} -->
-    <div class="footer">
-        <div class="user-menu">
-            <span class="user-menu_profile-pic"></span>
-            <span class="user-menu_username">ccslakey</span>
-            <img class="connection_icon" src="data:image/png;base64,iVBORw0KGgoAAAAN">
-            <span class="connection_status">online</span>
-        </div>
-        <div class="input-box">
-            <input type="text" class="input-box_text">
-        </div>
-    </div>
     </div>
 </body>
