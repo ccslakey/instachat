@@ -21,3 +21,6 @@ accounts-base
 accounts-password
 accounts-ui
 bozhao:accounts-instagram
+service-configuration
+email
+http

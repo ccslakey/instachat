@@ -4,7 +4,7 @@ if (Meteor.isClient) {
     Meteor.subscribe("messages");
 
     Accounts.ui.config({
-        passwordSignupFields: 'USERNAME_ONLY'
+        passwordSignupFields: 'USERNAME_AND_EMAIL'
     });
 
 
@@ -42,6 +42,19 @@ if (Meteor.isServer) {
     
     Meteor.startup(function() {
     
+        // set up email to confirm account creation with user
+        // thx mandrill
+        smtp = {
+            username: 'cromwellslakey@gmail.com',
+            password: 'orange3cow',
+            server:   'smtp.mandrillapp.com',
+            port: 587
+         };
+            
+        process.env.MAIL_URL = 'smtp://' + encodeURIComponent(smtp.username) + ':' + encodeURIComponent(smtp.password) + '@' + encodeURIComponent(smtp.server) + ':' + smtp.port;
+
+
+
         // sanity check your db and you will be pleased as punch
         //     for (var i = 0; i < 10; i++) {
         //         Messages.insert({
