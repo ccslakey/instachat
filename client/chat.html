@@ -6,18 +6,17 @@
 
 </head>
 
-<body>
-    {{> loginButtons}}
-    {{> header}}
+
+<template name="app">
+{{>header}}
+
+<div class="main">
     
-    <div class="main">
-        
+    
+    {{> listings}} 
+    
+    {{> yield}}
+</div>
 
-        {{> listings}} 
-        
-        {{> messages}}
-        
-        {{> footer}}
-
-    </div>
-</body>
+{{> footer}}
+</template>

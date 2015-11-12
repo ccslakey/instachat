@@ -24,6 +24,7 @@ body {
   left: 0;
   height: 53px;
   width: 100%;
+  z-index: 1;
 }
 
 .main {
@@ -120,6 +121,11 @@ body {
   margin-right: 17px;
   color: #ffffff;
   padding-left: 1rem;
+}
+
+.channel_name {
+  text-decoration: none;
+  color: inherit;
 }
 
 .unread {
