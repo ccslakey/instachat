@@ -55,21 +55,13 @@ if (Meteor.isClient) {
 
     // setting and getting channels
     // needs to be on client?
-    Meteor.startup(function() {
-        Session.setTemp('channel', 'general');
-    });
+
     Template.listings.helpers({
         channels: function() {
             return Channels.find();
         }
     });
-    Template.channel.events({
-        'click .channel': function(e) {
-            // make persistent across refresh/site visits??
-            // fix me!
-            Session.setPersistent('channel', this.name);
-        }
-    });
+
 
     // listen for submit message event
     Template.footer.events({

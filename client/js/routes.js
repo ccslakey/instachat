@@ -7,5 +7,6 @@ Router.route('/', function () {
 });
 
 Router.route('/:channel', function () {
+   	Session.setPersistent('channel', this.params.channel);
     this.render('messages');
 });
