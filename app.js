@@ -66,31 +66,27 @@ if (Meteor.isClient) {
     // listen for submit message event
     Template.footer.events({
         'keypress input': function(e) {
-            var inputVal = $('.input-box_text').val();
-            if (!!inputVal) {
+            var inputText = $('.input-box_text').val();
+            if (inputText) {
                 var charCode = (typeof e.which == "number") ? e.which : e.keyCode;
                 if (charCode == 13) {
                     e.stopPropagation();
-
                     Meteor.call('newMessage', {
-                        text: $('.input-box_text').val(),
+                        text: inputText,
                         channel: Session.get('channel')
                     });
-                    
-
                     $('.input-box_text').val("");
+
+                    if (inputText.split(" ")[0] == "*ig:") {
+                        var tagArr = inputText.split(" ");
+                        console.log("the tags are: ", tagArr);
+                    };
+
+
+
                     return false;
                 }
             }
-        }
-    });
-    // have to include on Client side for latency compensation
-    // if you have no connection to server you can still send a message on the client
-    Meteor.methods({
-        newMessage: function(message) {
-            message.timestamp = Date.now();
-            message.user = Meteor.userId();
-            Messages.insert(message);
         }
     });
 }
