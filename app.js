@@ -47,10 +47,10 @@ if (Meteor.isClient) {
     });
 
     Template.messages.onCreated(function() {
-      var self = this;
-      self.autorun(function() {
-        self.subscribe('messages', Session.get('channel'));
-      });
+        var self = this;
+        self.autorun(function() {
+            self.subscribe('messages', Session.get('channel'));
+        });
     });
 
 
@@ -79,8 +79,6 @@ if (Meteor.isClient) {
                         var tagArr = inputText.split(" ");
                         hashTag = tagArr[1];
                         console.log(hashTag);
-                        
-                        Meteor.call('instaMessage', hashTag);
                     };
                     return false;
                 }
@@ -93,7 +91,9 @@ if (Meteor.isClient) {
 if (Meteor.isServer) {
     // publications to client so we can hide our db from weird people
     Meteor.publish("messages", function(channel) {
-        return Messages.find({channel: channel});
+        return Messages.find({
+            channel: channel
+        });
     });
     Meteor.publish('channels', function() {
         return Channels.find();
@@ -132,17 +132,6 @@ if (Meteor.isServer) {
             message.timestamp = Date.now();
             message.user = Meteor.userId();
             Messages.insert(message);
-        },
-        instaMessage: function(tag){
-            var options = { tagName: 'tag' };
-            InstagramFetcher.fetchImages.fromTag(options, function ( images, pagination ) {
-                // images is a collection of the found images
-                console.log( images );
-                // The pagination object contains id's used for pagination. See below!
-                console.log( pagination );
-                // for sanity's sake
-                console.log("it works with"+tag);
-            });
-        } 
+        }
     });
 }
