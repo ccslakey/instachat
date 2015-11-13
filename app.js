@@ -53,8 +53,6 @@ if (Meteor.isClient) {
       });
     });
 
-    // setting and getting channels
-    // needs to be on client?
 
     Template.listings.helpers({
         channels: function() {
@@ -79,11 +77,11 @@ if (Meteor.isClient) {
 
                     if (inputText.split(" ")[0] == "*ig:") {
                         var tagArr = inputText.split(" ");
-                        console.log("the tags are: ", tagArr);
+                        hashTag = "#" + tagArr[1];
+                        console.log(hashTag);
+                        
+                        Meteor.call('instaMessage');
                     };
-
-
-
                     return false;
                 }
             }
@@ -100,6 +98,7 @@ if (Meteor.isServer) {
     Meteor.publish('channels', function() {
         return Channels.find();
     });
+
     Channels.remove({});
     Channels.insert({
         name: "general"
@@ -133,6 +132,16 @@ if (Meteor.isServer) {
             message.timestamp = Date.now();
             message.user = Meteor.userId();
             Messages.insert(message);
-        }
+        },
+        instaMessage: function(){
+            console.log("there will be insta");
+            var options = { tagName: 'cool dude' };
+            InstagramFetcher.fetchImages.fromTag(options, function ( images, pagination ) {
+                // images is a collection of the found images
+                console.log( images );
+                // The pagination object contains id's used for pagination. See below!
+                console.log( pagination );
+            });
+        } 
     });
 }
