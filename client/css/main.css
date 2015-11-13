@@ -10,6 +10,13 @@ html {
   font-family: 'Lato', sans-serif;
 }
 
+.instaphoto {
+  height: 150px;
+  width: 150px;
+  /*height: 50%;
+  width: 50%;*/
+}
+
 body {
   height: 100%;
   width: 100%;

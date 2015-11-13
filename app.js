@@ -69,7 +69,7 @@ if (Meteor.isClient) {
                 var charCode = (typeof e.which == "number") ? e.which : e.keyCode;
                 if (charCode == 13) {
                     e.stopPropagation();
-                    var instaRes;
+                    var instaURL;
 
                     if (inputText.split(" ")[0] == "*ig:") {
                         var tagArr = inputText.split(" ");
@@ -80,17 +80,17 @@ if (Meteor.isClient) {
                             if (response) {
                                 instaRes = JSON.parse(response.content);
                                 console.log(instaRes);
-                                instaHref = instaRes.data[0].link
-                                console.log(instaHref);
+                                instaURL = instaRes.data[0].images.standard_resolution.url;
+                                
 
-                                Meteor.call('newMessage', {
-                                    insta: instaHref,
-                                    text: inputText,
-                                    channel: Session.get('channel')
-                                });
-                                // stupid ajax workaround
-                                $('.input-box_text').val("");
-                                return false;
+                                // Meteor.call('newMessage', {
+                                //     insta: instaURL,
+                                //     text: inputText,
+                                //     channel: Session.get('channel')
+                                // });
+                                // // stupid ajax workaround
+                                // $('.input-box_text').val("");
+                                // return true;
 
                             } else if (error) {
                                 console.log("ERROR! Status: " + error.error + " because of " + error.reason)
@@ -100,8 +100,9 @@ if (Meteor.isClient) {
                         });
                     };
 
-
+                    console.log(instaURL);
                     Meteor.call('newMessage', {
+                        insta: instaURL,
                         text: inputText,
                         channel: Session.get('channel')
                     });
