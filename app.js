@@ -69,27 +69,45 @@ if (Meteor.isClient) {
                 var charCode = (typeof e.which == "number") ? e.which : e.keyCode;
                 if (charCode == 13) {
                     e.stopPropagation();
+                    var instaRes;
+
+                    if (inputText.split(" ")[0] == "*ig:") {
+                        var tagArr = inputText.split(" ");
+                        hashTag = tagArr[1];
+                        console.log("looking for #"+hashTag);
+
+                        Meteor.call("callInstagram", hashTag, function(error, response) {
+                            if (response) {
+                                instaRes = JSON.parse(response.content);
+                                console.log(instaRes);
+                                instaHref = instaRes.data[0].link
+                                console.log(instaHref);
+
+                                Meteor.call('newMessage', {
+                                    insta: instaHref,
+                                    text: inputText,
+                                    channel: Session.get('channel')
+                                });
+                                // stupid ajax workaround
+                                $('.input-box_text').val("");
+                                return false;
+
+                            } else if (error) {
+                                console.log("ERROR! Status: " + error.error + " because of " + error.reason)
+                            };
+
+
+                        });
+                    };
+
+
                     Meteor.call('newMessage', {
                         text: inputText,
                         channel: Session.get('channel')
                     });
                     $('.input-box_text').val("");
 
-                    if (inputText.split(" ")[0] == "*ig:") {
-                        var tagArr = inputText.split(" ");
-                        hashTag = tagArr[1];
-                        console.log(hashTag);
-                        
-                        Meteor.call("callInstagram", hashTag, function(error, response) {
-                                if (response) {
-                                console.log(JSON.parse(response.content))
-                                } else if(error){
-                                    console.log("ERROR! Status: " + error.error + " because of " + error.reason)
-                                };
-                                
 
-                            });
-                    };
                     return false;
                 }
             }
