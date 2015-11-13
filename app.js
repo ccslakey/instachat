@@ -77,7 +77,7 @@ if (Meteor.isClient) {
 
                     if (inputText.split(" ")[0] == "*ig:") {
                         var tagArr = inputText.split(" ");
-                        hashTag = "#" + tagArr[1];
+                        hashTag = tagArr[1];
                         console.log(hashTag);
                         
                         Meteor.call('instaMessage', hashTag);
@@ -133,14 +133,15 @@ if (Meteor.isServer) {
             message.user = Meteor.userId();
             Messages.insert(message);
         },
-        instaMessage: function(){
-            var options = { tagName: 'cool' };
+        instaMessage: function(tag){
+            var options = { tagName: 'tag' };
             InstagramFetcher.fetchImages.fromTag(options, function ( images, pagination ) {
                 // images is a collection of the found images
                 console.log( images );
                 // The pagination object contains id's used for pagination. See below!
                 console.log( pagination );
-                console.log("it works!!")
+                // for sanity's sake
+                console.log("it works with"+tag);
             });
         } 
     });
