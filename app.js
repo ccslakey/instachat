@@ -79,6 +79,10 @@ if (Meteor.isClient) {
                         var tagArr = inputText.split(" ");
                         hashTag = tagArr[1];
                         console.log(hashTag);
+                        
+                        Meteor.call("checkTwitter", function(error, results) {
+                                console.log(JSON.parse(results.content)); //results.data should be a JSON object
+                            });
                     };
                     return false;
                 }
@@ -132,6 +136,10 @@ if (Meteor.isServer) {
             message.timestamp = Date.now();
             message.user = Meteor.userId();
             Messages.insert(message);
+        },
+        checkTwitter: function() {
+            this.unblock();
+            return Meteor.http.call("GET", "https://api.instagram.com/v1/tags/nofilter/media/recent?client_id=90f3cb97b92b4ee0b847996ec7aa9264");
         }
     });
 }
