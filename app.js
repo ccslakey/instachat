@@ -68,43 +68,47 @@ if (Meteor.isClient) {
             if (inputText) {
                 var charCode = (typeof e.which == "number") ? e.which : e.keyCode;
                 if (charCode == 13) {
-                    e.preventDefault();
+                    e.stopPropagation();
                     var instaURL;
-                    // you gotta fix how slow this is
+
                     if (inputText.split(" ")[0] == "*ig:") {
                         var tagArr = inputText.split(" ");
                         hashTag = tagArr[1];
-                        console.log("looking for #" + hashTag);
+                        console.log("looking for #"+hashTag);
 
-                        Meteor.call("callInstagram", hashTag, function(error, response) {
+                        Meteor.call("callInstagramWithFuture", hashTag, function(error, response) {
                             if (response) {
                                 instaRes = JSON.parse(response.content);
                                 console.log(instaRes);
                                 instaURL = instaRes.data[0].images.standard_resolution.url;
                                 console.log(instaURL);
-                                Meteor.call('newMessage', {
-                                    insta: instaURL,
-                                    text: inputText,
-                                    channel: Session.get('channel')
-                                });
-                                $('.input-box_text').val("");
-
-
-                                return false;
                             } else if (error) {
-                                console.log("ERROR! Status: " + error.error + " because of " + error.reason)
+                                console.log("ERROR! " + error)
                             };
 
 
                         });
-                    } else {
+                        console.log(instaURL);
                         Meteor.call('newMessage', {
+                            insta: instaURL,
                             text: inputText,
                             channel: Session.get('channel')
                         });
                         $('.input-box_text').val("");
+
+
                         return false;
-                    }
+                    };
+
+                    
+                    Meteor.call('newMessage', {
+                        text: inputText,
+                        channel: Session.get('channel')
+                    });
+                    $('.input-box_text').val("");
+
+
+                    return false;
                 }
             }
         }
@@ -113,6 +117,9 @@ if (Meteor.isClient) {
 
 
 if (Meteor.isServer) {
+    // because async
+    var Future = Npm.require( 'fibers/future' ); 
+
     // publications to client so we can hide our db from weird people
     Meteor.publish("messages", function(channel) {
         return Messages.find({
@@ -157,8 +164,16 @@ if (Meteor.isServer) {
             message.user = Meteor.userId();
             Messages.insert(message);
         },
-        callInstagram: function(tag) {
-            return Meteor.http.call("GET", "https://api.instagram.com/v1/tags/" + tag + "/media/recent?client_id=" + Meteor.settings.InstagramAPI.CLIENT_ID);
+        callInstagramWithFuture: function(tag) {
+            var future = new Future();
+            Meteor.http.call("GET", "https://api.instagram.com/v1/tags/" + tag + "/media/recent?client_id=" + Meteor.settings.InstagramAPI.CLIENT_ID, {}, function (err, res) {
+                if (err){
+                    future.return(error);
+                } else {
+                    future.return(res);
+                }
+            });
+            return future.wait();
         }
     });
 }
