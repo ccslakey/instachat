@@ -229,19 +229,6 @@ body {
   left: 0;
 }
 
-.user-menu_profile-pic {
-  display: inline-block;
-  float: left;
-  -moz-border-radius: 0.2rem;
-  -webkit-border-radius: 0.2rem;
-  border-radius: 0.2rem;
-  width: 48px;
-  height: 48px;
-  background-image: url("http://i.imgur.com/LikUNLc.png");
-  background-size: cover;
-  margin-right: 8px;
-}
-
 .user-menu_username {
   display: block;
   color: #ffffff;
