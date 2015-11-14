@@ -140,6 +140,20 @@ if (Meteor.isServer) {
         name: "random"
     });
 
+
+    Accounts.onCreateUser(function(options, user) {
+      if (options.profile) {
+        user.profile = options.profile;
+      }
+
+      user.profile.instagram = {};
+      user.profile.instagram.email = user.services.instagram.email;
+      user.profile.instagram.username = user.services.instagram.username;
+
+      return user;
+    });
+
+
     Meteor.startup(function() {
         // set up email to confirm account creation with user
         // thx mandrill
@@ -168,7 +182,7 @@ if (Meteor.isServer) {
         },
         callInstagramWithFuture: function(tag) {
             var future = new Future();
-            Meteor.http.call("GET", "https://api.instagram.com/v1/tags/" + tag + "/media/recent?client_id=" + Meteor.settings.InstagramAPI.CLIENT_ID, {}, function (err, res) {
+            Meteor.http.call("GET", "https://api.instagram.com/v1/tags/" + tag + "/media/recent?client_id=" + Meteor.settings.InstagramAPI.CLIENT_ID+ "&count=1", {}, function (err, res) {
                 if (err){
                     future.return(error);
                 } else {
