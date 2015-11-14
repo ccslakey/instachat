@@ -1,6 +1,10 @@
 <template name="footer">
     <div class="footer">
         <div class="user-menu">
+        <!-- try and get gravatar image -->
+        {{#if gravatar}}
+        <img class="user-gravatar" src="{{url}}">
+        {{/if}}
 
             <span class="user-menu_username">{{username}}</span>
             <img class="connection_icon">

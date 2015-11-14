@@ -47,6 +47,7 @@ if (Meteor.isClient) {
         messages: Messages.find({})
     });
 
+    // subscribe template to messages on a particular channel
     Template.messages.onCreated(function() {
         var self = this;
         self.autorun(function() {
@@ -54,7 +55,7 @@ if (Meteor.isClient) {
         });
     });
 
-
+    // get the channels
     Template.listings.helpers({
         channels: function() {
             return Channels.find();
@@ -151,7 +152,6 @@ if (Meteor.isServer) {
       }
 
       user.profile.instagram = {};
-      user.profile.instagram.email = user.services.instagram.email;
       user.profile.instagram.username = user.services.instagram.username;
 
       return user;
