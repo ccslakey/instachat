@@ -5,6 +5,7 @@ Channels = new Mongo.Collection("channels");
 if (Meteor.isClient) {
     Meteor.subscribe("messages");
     Meteor.subscribe("channels");
+    Meteor.subscribe("users");
 
     Accounts.ui.config({
         passwordSignupFields: 'USERNAME_AND_EMAIL'
@@ -131,6 +132,9 @@ if (Meteor.isServer) {
     Meteor.publish('channels', function() {
         return Channels.find();
     });
+    Meteor.publish("users", function(){
+      return Meteor.users.find({},{fields:{profile:1}})
+    })
 
     Channels.remove({});
     Channels.insert({

@@ -2,7 +2,7 @@
 Template.footer.helpers({
     username: function() {
         if (Meteor.user()) {
-            var instagramUsername = Meteor.user() && Meteor.user().services.instagram.username
+            var instagramUsername = Meteor.user() && Meteor.user().profile.instagram.username
             return instagramUsername
         } else {
             return Meteor.user() && Meteor.user().username;
