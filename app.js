@@ -89,21 +89,25 @@ if (Meteor.isClient) {
 
                         // });
                         
-                        var res = Meteor.http.call("GET", "https://api.instagram.com/v1/tags/" + hashTag + "/media/recent?client_id=90f3cb97b92b4ee0b847996ec7aa9264");
-                        instaRes = JSON.parse(res.content);
-                        console.log(instaRes);
-                        instaURL = instaRes.data[0].images.standard_resolution.url;
-                        console.log(instaURL);
+                        var res = Meteor.http.call("GET", "https://api.instagram.com/v1/tags/" + hashTag + "/media/recent?client_id=90f3cb97b92b4ee0b847996ec7aa9264", function (err, res) {
+                            
+                            instaRes = JSON.parse(res.content);
 
-                        Meteor.call('newMessage', {
-                            insta: instaURL,
-                            text: inputText,
-                            channel: Session.get('channel')
+                            console.log(instaRes);
+                            instaURL = instaRes.data[0].images.standard_resolution.url;
+                            console.log(instaURL);
+
+                            Meteor.call('newMessage', {
+                                insta: instaURL,
+                                text: inputText,
+                                channel: Session.get('channel')
+                            });
+                            $('.input-box_text').val("");
+
+
+                            return false;
                         });
-                        $('.input-box_text').val("");
 
-
-                        return false;
                     };
 
                     
