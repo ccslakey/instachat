@@ -8,6 +8,12 @@
             {{/each}}
         </ul>
     </div>
-    <div class="listings_direct-messages"></div>
+    <div class="listings_direct-messages">
+    	<ul class="user_list">
+    	    {{#each user}}
+    	    	{{>userPill}}
+    	    {{/each}}
+    	</ul>
+    </div>
 </div>
 </template>

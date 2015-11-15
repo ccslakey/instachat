@@ -11,6 +11,16 @@ if (Meteor.isClient) {
         passwordSignupFields: 'USERNAME_AND_EMAIL'
     });
 
+    Template.userPill.labelClass = function() {
+        if (this.status.idle) {
+            return "label-warning"
+        } else if (this.status.online) {
+            return "label-success"
+        } else {
+            return "label-default"
+        }
+    };
+
 
     // decide to return insta or app username
     Template.registerHelper("usernameFromId", function(userId) {
@@ -76,7 +86,7 @@ if (Meteor.isClient) {
                     if (inputText.split(" ")[0] == "*ig:") {
                         var tagArr = inputText.split(" ");
                         hashTag = tagArr[1];
-                        console.log("looking for #"+hashTag);
+                        console.log("looking for #" + hashTag);
 
                         Meteor.call("callInstagramWithFuture", hashTag, function(error, response) {
                             if (response) {
@@ -108,10 +118,10 @@ if (Meteor.isClient) {
                         $('.input-box_text').val("");
 
 
-                        return false;   
+                        return false;
                     }
 
-                    
+
 
                 }
             }
@@ -122,7 +132,7 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
     // because async
-    var Future = Npm.require( 'fibers/future' ); 
+    var Future = Npm.require('fibers/future');
 
     // publications to client so we can hide our db from weird people
     Meteor.publish("messages", function(channel) {
@@ -133,8 +143,12 @@ if (Meteor.isServer) {
     Meteor.publish('channels', function() {
         return Channels.find();
     });
-    Meteor.publish("users", function(){
-      return Meteor.users.find({},{fields:{profile:1}})
+    Meteor.publish("users", function() {
+        return Meteor.users.find({}, {
+            fields: {
+                profile: 1
+            }
+        })
     })
 
     Channels.remove({});
@@ -147,14 +161,14 @@ if (Meteor.isServer) {
 
 
     Accounts.onCreateUser(function(options, user) {
-      if (options.profile) {
-        user.profile = options.profile;
-      }
+        if (options.profile) {
+            user.profile = options.profile;
+        }
 
-      user.profile.instagram = {};
-      user.profile.instagram.username = user.services.instagram.username;
+        user.profile.instagram = {};
+        user.profile.instagram.username = user.services.instagram.username;
 
-      return user;
+        return user;
     });
 
 
@@ -186,8 +200,8 @@ if (Meteor.isServer) {
         },
         callInstagramWithFuture: function(tag) {
             var future = new Future();
-            Meteor.http.call("GET", "https://api.instagram.com/v1/tags/" + tag + "/media/recent?client_id=" + Meteor.settings.InstagramAPI.CLIENT_ID+ "&count=1", {}, function (err, res) {
-                if (err){
+            Meteor.http.call("GET", "https://api.instagram.com/v1/tags/" + tag + "/media/recent?client_id=" + Meteor.settings.InstagramAPI.CLIENT_ID + "&count=1", {}, function(err, res) {
+                if (err) {
                     future.return(error);
                 } else {
                     future.return(res);
