@@ -6,11 +6,12 @@ if (Meteor.isClient) {
     Meteor.subscribe("messages");
     Meteor.subscribe("channels");
     Meteor.subscribe("users");
-
+    
     Accounts.ui.config({
         passwordSignupFields: 'USERNAME_AND_EMAIL'
     });
 
+    // set online status for a user in the sidebar
     Template.userPill.labelClass = function() {
         if (this.status.idle) {
             return "label-warning"
@@ -33,7 +34,7 @@ if (Meteor.isClient) {
 
         return user.username;
     });
-    // get format timestamp
+    //format timestamp to human readable format
     Template.registerHelper("timestampToTime", function(timestamp) {
         var date = new Date(timestamp);
         var hours = date.getHours();
@@ -52,7 +53,7 @@ if (Meteor.isClient) {
         }
     });
 
-
+    // get messages
     Template.messages.helpers({
         messages: Messages.find({})
     });
@@ -82,18 +83,21 @@ if (Meteor.isClient) {
                 if (charCode == 13) {
                     e.stopPropagation();
                     var instaURL;
-
-                    if (inputText.split(" ")[0] == "*ig:") {
+                    // check if a user wants to make an instagram post
+                    if (inputText.split(" ")[0] == "ig:") {
+                        // get the words
                         var tagArr = inputText.split(" ");
+                        // use the first one as a hashtag to post
                         hashTag = tagArr[1];
                         console.log("looking for #" + hashTag);
-
+                        // call the server-side method to make http.get request on instagram's api
                         Meteor.call("callInstagramWithFuture", hashTag, function(error, response) {
                             if (response) {
                                 instaRes = JSON.parse(response.content);
-                                console.log(instaRes);
+                                // console.log(instaRes);
                                 instaURL = instaRes.data[0].images.standard_resolution.url;
-                                console.log(instaURL);
+                                // console.log(instaURL);
+                                // insert a new message with instagram photo below it
                                 Meteor.call('newMessage', {
                                     insta: instaURL,
                                     text: inputText,
@@ -104,6 +108,7 @@ if (Meteor.isClient) {
 
                                 return false;
                             } else if (error) {
+                                // basic error handling
                                 console.log("ERROR! " + error)
                             };
 
@@ -111,6 +116,7 @@ if (Meteor.isClient) {
                         });
 
                     } else {
+                        // don't use instagram in the message
                         Meteor.call('newMessage', {
                             text: inputText,
                             channel: Session.get('channel')
@@ -143,6 +149,7 @@ if (Meteor.isServer) {
     Meteor.publish('channels', function() {
         return Channels.find();
     });
+    // so we can give instagram username from server to the client
     Meteor.publish("users", function() {
         return Meteor.users.find({}, {
             fields: {
@@ -150,7 +157,7 @@ if (Meteor.isServer) {
             }
         })
     })
-
+    // every group has the two basic channels
     Channels.remove({});
     Channels.insert({
         name: "general"
@@ -159,22 +166,22 @@ if (Meteor.isServer) {
         name: "random"
     });
 
-
+    // set some easy to get information
+    // so we don't have to dig into the user.services object
+    // we just want to add our own data to the object
     Accounts.onCreateUser(function(options, user) {
         if (options.profile) {
             user.profile = options.profile;
         }
-
         user.profile.instagram = {};
         user.profile.instagram.username = user.services.instagram.username;
-
         return user;
     });
 
 
     Meteor.startup(function() {
         // set up email to confirm account creation with user
-        // thx mandrill
+        // this will display in the terminal console when you create an account
         smtp = {
             username: 'cromwellslakey@gmail.com',
             password: 'orange3cow',
@@ -193,12 +200,14 @@ if (Meteor.isServer) {
     });
 
     Meteor.methods({
+        // create a new message (in a channel)
         newMessage: function(message) {
             message.timestamp = Date.now();
             message.user = Meteor.userId();
             Messages.insert(message);
         },
         callInstagramWithFuture: function(tag) {
+            //use npm future package in order to make newMessage WAIT until http response
             var future = new Future();
             Meteor.http.call("GET", "https://api.instagram.com/v1/tags/" + tag + "/media/recent?client_id=" + Meteor.settings.InstagramAPI.CLIENT_ID + "&count=1", {}, function(err, res) {
                 if (err) {
