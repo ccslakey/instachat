@@ -171,28 +171,28 @@ if (Meteor.isServer) {
     // set some easy to get information
     // so we don't have to dig into the user.services object
     // we just want to add our own data to the object
-    Accounts.onCreateUser(function(options, user) {
-        if (options.profile) {
-            user.profile = options.profile;
-        }
-        user.profile.instagram = {};
-        user.profile.instagram.username = user.services.instagram.username;
-        return user;
-    });
+    // Accounts.onCreateUser(function(options, user) {
+    //     if (options.profile) {
+    //         user.profile = options.profile;
+    //     }
+    //     user.profile.instagram = {};
+    //     user.profile.instagram.username = user.services.instagram.username;
+    //     return user;
+    // });
 
 
-    Meteor.startup(function() {
-        // set up email to confirm account creation with user
-        // this will display in the terminal console when you create an account
-        smtp = {
-            username: 'cromwellslakey@gmail.com',
-            password: 'orange3cow',
-            server: 'smtp.mandrillapp.com',
-            port: 587
-        };
-        process.env.MAIL_URL = 'smtp://' + encodeURIComponent(smtp.username) + ':' + encodeURIComponent(smtp.password) + '@' + encodeURIComponent(smtp.server) + ':' + smtp.port;
+    // Meteor.startup(function() {
+    //     // set up email to confirm account creation with user
+    //     // this will display in the terminal console when you create an account
+    //     smtp = {
+    //         username: 'cromwellslakey@gmail.com',
+    //         password: 'orange3cow',
+    //         server: 'smtp.mandrillapp.com',
+    //         port: 587
+    //     };
+    //     process.env.MAIL_URL = 'smtp://' + encodeURIComponent(smtp.username) + ':' + encodeURIComponent(smtp.password) + '@' + encodeURIComponent(smtp.server) + ':' + smtp.port;
 
-    });
+    // });
 
     // allow messages if user is properly logged in
     Messages.allow({
