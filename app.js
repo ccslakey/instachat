@@ -24,6 +24,7 @@ if (Meteor.isClient) {
 
 
     // decide to return insta or app username
+    // get the username one way or another and display it in the footer
     Template.registerHelper("usernameFromId", function(userId) {
         var user = Meteor.users.findOne({
             _id: userId
@@ -43,6 +44,7 @@ if (Meteor.isClient) {
         return hours + ':' + minutes.substr(minutes.length - 2) + ':' + seconds.substr(seconds.length - 2);
     });
 
+    // which channel is the user on and return a class for it
     Template.channel.helpers({
         active: function() {
             if (Session.get('channel') === this.name) {
